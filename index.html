@@ -1,0 +1,1523 @@
+<!DOCTYPE html>
+<html lang="ur" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CryptoUrdu | کرپٹو نیوز اردو</title>
+<meta name="description" content="تازہ ترین کرپٹو خبریں اردو میں، AI خلاصہ، مارکیٹ تجزیہ">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400;600;700&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #050a12;
+    --bg2: #0b1220;
+    --bg3: #111d2e;
+    --card: #0f1a27;
+    --card2: #162030;
+    --accent: #00d4ff;
+    --accent2: #7b61ff;
+    --green: #00e676;
+    --red: #ff3d5a;
+    --yellow: #ffd740;
+    --text: #e8f4ff;
+    --text2: #8ca8c4;
+    --text3: #4a6a88;
+    --border: #1a2d42;
+    --glow: 0 0 20px rgba(0,212,255,0.15);
+    --font-urdu: 'Noto Nastaliq Urdu', serif;
+    --font-en: 'Space Grotesk', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-urdu);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── GRID NOISE BACKGROUND ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── TICKER ── */
+  .ticker-wrap {
+    background: var(--bg3);
+    border-bottom: 1px solid var(--border);
+    overflow: hidden;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    position: relative;
+    z-index: 10;
+  }
+  .ticker-label {
+    background: var(--accent);
+    color: #000;
+    font-family: var(--font-en);
+    font-size: 11px;
+    font-weight: 700;
+    padding: 0 12px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    flex-shrink: 0;
+    letter-spacing: 0.05em;
+  }
+  .ticker-track {
+    display: flex;
+    animation: ticker 30s linear infinite;
+    white-space: nowrap;
+    font-family: var(--font-en);
+    font-size: 12px;
+    gap: 40px;
+    padding-left: 20px;
+  }
+  .ticker-item { display: flex; align-items: center; gap: 6px; }
+  .ticker-item .sym { color: var(--text2); font-weight: 600; }
+  .ticker-item .up { color: var(--green); }
+  .ticker-item .dn { color: var(--red); }
+  @keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+  /* ── NAVBAR ── */
+  nav {
+    background: rgba(5,10,18,0.95);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    padding: 0 24px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .logo {
+    font-family: var(--font-en);
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--accent);
+    text-shadow: 0 0 20px rgba(0,212,255,0.5);
+    text-decoration: none;
+    letter-spacing: -0.03em;
+    flex-shrink: 0;
+  }
+  .logo span { color: var(--text2); font-weight: 400; }
+  .nav-links {
+    display: flex;
+    gap: 4px;
+    list-style: none;
+    font-size: 13px;
+  }
+  .nav-links a {
+    color: var(--text2);
+    text-decoration: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    transition: all 0.2s;
+    font-family: var(--font-urdu);
+    font-size: 14px;
+    cursor: pointer;
+  }
+  .nav-links a:hover, .nav-links a.active { color: var(--accent); background: rgba(0,212,255,0.08); }
+  .nav-right { display: flex; align-items: center; gap: 10px; }
+  .live-badge {
+    background: rgba(0,230,118,0.1);
+    border: 1px solid var(--green);
+    color: var(--green);
+    font-family: var(--font-en);
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 20px;
+    letter-spacing: 0.08em;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .live-dot { width: 6px; height: 6px; background: var(--green); border-radius: 50%; animation: pulse 1.5s infinite; }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+  /* ── MAIN LAYOUT ── */
+  main { position: relative; z-index: 1; max-width: 1400px; margin: 0 auto; padding: 0 20px; }
+
+  /* ── SECTION TABS ── */
+  .section-tabs {
+    display: flex;
+    gap: 6px;
+    padding: 20px 0 0;
+    flex-wrap: wrap;
+  }
+  .tab-btn {
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--text2);
+    font-family: var(--font-urdu);
+    font-size: 14px;
+    padding: 8px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .tab-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .tab-btn.active { background: rgba(0,212,255,0.1); border-color: var(--accent); color: var(--accent); }
+
+  /* ── SECTION PAGES ── */
+  .page { display: none; padding: 20px 0 40px; }
+  .page.active { display: block; }
+
+  /* ── HERO STATS ── */
+  .hero-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    transition: all 0.2s;
+  }
+  .stat-card:hover { border-color: var(--accent); box-shadow: var(--glow); transform: translateY(-2px); }
+  .stat-label { font-size: 12px; color: var(--text3); margin-bottom: 6px; font-family: var(--font-en); letter-spacing: 0.05em; text-transform: uppercase; }
+  .stat-value { font-family: var(--font-mono); font-size: 22px; font-weight: 600; color: var(--text); }
+  .stat-change { font-family: var(--font-mono); font-size: 12px; margin-top: 4px; }
+  .stat-change.up { color: var(--green); }
+  .stat-change.dn { color: var(--red); }
+
+  /* ── SENTIMENT BAR ── */
+  .sentiment-section {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 24px;
+  }
+  .sentiment-title { font-size: 16px; color: var(--text); margin-bottom: 14px; }
+  .sentiment-bar-wrap { display: flex; align-items: center; gap: 12px; }
+  .sentiment-bar { flex: 1; height: 12px; border-radius: 6px; background: var(--bg3); overflow: hidden; position: relative; }
+  .sentiment-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--red), var(--yellow) 50%, var(--green));
+    border-radius: 6px;
+    position: relative;
+  }
+  .sentiment-needle {
+    position: absolute;
+    top: -4px;
+    width: 4px;
+    height: 20px;
+    background: #fff;
+    border-radius: 2px;
+    transform: translateX(-50%);
+    transition: left 1s ease;
+    box-shadow: 0 0 8px rgba(255,255,255,0.8);
+  }
+  .sentiment-labels { display: flex; justify-content: space-between; font-size: 11px; color: var(--text3); margin-top: 6px; font-family: var(--font-en); }
+  .sentiment-score {
+    font-family: var(--font-mono);
+    font-size: 28px;
+    font-weight: 700;
+    min-width: 60px;
+    text-align: center;
+  }
+  .s-bullish { color: var(--green); }
+  .s-bearish { color: var(--red); }
+  .s-neutral { color: var(--yellow); }
+
+  /* ── NEWS GRID ── */
+  .news-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  @media (max-width: 900px) { .news-grid { grid-template-columns: 1fr; } }
+
+  .news-main { display: flex; flex-direction: column; gap: 12px; }
+  .news-side { display: flex; flex-direction: column; gap: 12px; }
+
+  .news-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+  .news-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .news-card:hover { border-color: rgba(0,212,255,0.4); transform: translateY(-2px); box-shadow: var(--glow); }
+  .news-card:hover::before { opacity: 1; }
+  .news-card.featured { border-color: rgba(0,212,255,0.3); }
+  .news-card.featured::before { opacity: 1; }
+
+  .news-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+  .news-tag {
+    font-family: var(--font-en);
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 4px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .tag-bullish { background: rgba(0,230,118,0.15); color: var(--green); border: 1px solid rgba(0,230,118,0.3); }
+  .tag-bearish { background: rgba(255,61,90,0.15); color: var(--red); border: 1px solid rgba(255,61,90,0.3); }
+  .tag-neutral { background: rgba(255,215,64,0.15); color: var(--yellow); border: 1px solid rgba(255,215,64,0.3); }
+
+  .news-time { font-family: var(--font-en); font-size: 11px; color: var(--text3); }
+  .news-source { font-family: var(--font-en); font-size: 11px; color: var(--text3); }
+  .news-coin-badge {
+    font-family: var(--font-en);
+    font-size: 10px;
+    font-weight: 600;
+    background: var(--bg3);
+    padding: 2px 7px;
+    border-radius: 4px;
+    color: var(--accent);
+  }
+
+  .news-title { font-size: 16px; color: var(--text); line-height: 1.6; margin-bottom: 10px; }
+  .news-summary { font-size: 13px; color: var(--text2); line-height: 1.8; margin-bottom: 12px; }
+  .news-impact {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    background: var(--bg3);
+  }
+  .impact-label { color: var(--text3); font-family: var(--font-en); font-size: 11px; }
+
+  /* ── GAINERS/LOSERS ── */
+  .gl-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  @media (max-width: 600px) { .gl-grid { grid-template-columns: 1fr; } }
+
+  .gl-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+  }
+  .gl-title {
+    font-size: 14px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .gl-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .gl-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--border);
+    gap: 8px;
+  }
+  .gl-item:last-child { border-bottom: none; }
+  .gl-coin-info { display: flex; align-items: center; gap: 10px; }
+  .coin-icon {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-en);
+    font-size: 11px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .gl-sym { font-family: var(--font-en); font-size: 13px; font-weight: 600; color: var(--text); }
+  .gl-name { font-size: 11px; color: var(--text3); font-family: var(--font-en); }
+  .gl-price { font-family: var(--font-mono); font-size: 13px; font-weight: 600; }
+  .gl-pct { font-family: var(--font-mono); font-size: 12px; font-weight: 600; }
+  .up-color { color: var(--green); }
+  .dn-color { color: var(--red); }
+
+  /* ── COIN TABLE ── */
+  .section-title {
+    font-size: 18px;
+    color: var(--text);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .coin-table-wrap {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+  .coin-table-filters {
+    display: flex;
+    gap: 6px;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .filter-btn {
+    font-family: var(--font-urdu);
+    font-size: 12px;
+    padding: 5px 12px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text2);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .filter-btn:hover, .filter-btn.active { background: rgba(0,212,255,0.1); border-color: var(--accent); color: var(--accent); }
+  .filter-search {
+    margin-right: auto;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 5px 12px;
+    color: var(--text);
+    font-family: var(--font-en);
+    font-size: 12px;
+    outline: none;
+    width: 180px;
+  }
+  .filter-search:focus { border-color: var(--accent); }
+
+  table { width: 100%; border-collapse: collapse; }
+  thead tr { background: var(--bg3); }
+  th {
+    padding: 10px 14px;
+    text-align: right;
+    font-family: var(--font-en);
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text3);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  th:first-child { text-align: right; }
+  td {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    vertical-align: middle;
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(0,212,255,0.03); }
+  .coin-rank { color: var(--text3); font-size: 12px; width: 30px; text-align: center; }
+  .coin-name-cell { display: flex; align-items: center; gap: 10px; }
+  .coin-fullname { font-family: var(--font-en); font-size: 13px; font-weight: 600; color: var(--text); }
+  .coin-ticker { font-family: var(--font-en); font-size: 11px; color: var(--text3); }
+  .top-holder {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .holder-name { font-family: var(--font-en); font-size: 12px; color: var(--text2); }
+  .holder-amount { font-size: 11px; color: var(--text3); }
+
+  /* mini spark */
+  .spark { display: flex; align-items: flex-end; gap: 2px; height: 28px; }
+  .spark-bar { width: 4px; border-radius: 2px; flex-shrink: 0; }
+
+  /* ── WHALE SECTION ── */
+  .whale-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 24px;
+  }
+  .whale-list { display: flex; flex-direction: column; gap: 10px; }
+  .whale-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: var(--bg3);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+  .whale-rank { font-family: var(--font-en); font-size: 18px; font-weight: 700; color: var(--text3); min-width: 32px; text-align: center; }
+  .whale-rank.gold { color: #ffd740; }
+  .whale-rank.silver { color: #aaa; }
+  .whale-rank.bronze { color: #cd7f32; }
+  .whale-info { flex: 1; }
+  .whale-name { font-family: var(--font-en); font-size: 14px; font-weight: 600; color: var(--text); }
+  .whale-desc { font-size: 12px; color: var(--text3); margin-top: 2px; }
+  .whale-amount { text-align: left; }
+  .whale-value { font-family: var(--font-mono); font-size: 14px; font-weight: 700; color: var(--accent); }
+  .whale-coin { font-family: var(--font-en); font-size: 11px; color: var(--text3); margin-top: 2px; text-align: left; }
+
+  /* ── STABLECOIN SECTION ── */
+  .stable-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .stable-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .stable-header { display: flex; align-items: center; gap: 10px; }
+  .stable-icon {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-en);
+    font-size: 12px;
+    font-weight: 700;
+    border: 2px solid;
+  }
+  .stable-name { font-family: var(--font-en); font-size: 14px; font-weight: 700; color: var(--text); }
+  .stable-full { font-size: 11px; color: var(--text3); }
+  .stable-peg { display: flex; justify-content: space-between; align-items: center; }
+  .peg-label { font-size: 12px; color: var(--text3); }
+  .peg-ok { color: var(--green); font-family: var(--font-mono); font-size: 13px; font-weight: 600; }
+  .peg-warn { color: var(--yellow); font-family: var(--font-mono); font-size: 13px; font-weight: 600; }
+  .stable-mcap { font-family: var(--font-mono); font-size: 20px; font-weight: 700; color: var(--text); }
+  .stable-mcap-label { font-size: 11px; color: var(--text3); font-family: var(--font-en); }
+  .stable-vol { font-size: 12px; color: var(--text2); }
+
+  /* ── ALT COINS SECTION ── */
+  .alt-categories {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+  .cat-chip {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    color: var(--text2);
+    font-family: var(--font-en);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 5px 12px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .cat-chip:hover, .cat-chip.active { background: rgba(123,97,255,0.15); border-color: var(--accent2); color: var(--accent2); }
+
+  /* ── AI SUMMARY BOX ── */
+  .ai-box {
+    background: linear-gradient(135deg, rgba(123,97,255,0.08), rgba(0,212,255,0.05));
+    border: 1px solid rgba(123,97,255,0.3);
+    border-radius: 10px;
+    padding: 14px;
+    margin-top: 10px;
+  }
+  .ai-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    font-family: var(--font-en);
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--accent2);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .ai-icon { font-size: 14px; }
+  .ai-text { font-size: 13px; color: var(--text2); line-height: 1.8; }
+
+  /* ── MINI CHART ── */
+  canvas { border-radius: 4px; }
+
+  /* ── NEWS DETAIL ── */
+  .news-detail {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    max-width: 800px;
+  }
+  .back-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text2);
+    font-family: var(--font-urdu);
+    font-size: 14px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-bottom: 20px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+  }
+  .back-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ── MODAL ── */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.8);
+    backdrop-filter: blur(6px);
+    z-index: 200;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    max-width: 680px;
+    width: 100%;
+    max-height: 85vh;
+    overflow-y: auto;
+    position: relative;
+  }
+  .modal-close {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    color: var(--text2);
+    width: 30px; height: 30px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 18px;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+    font-family: var(--font-en);
+  }
+  .modal-close:hover { background: var(--red); color: #fff; border-color: var(--red); }
+  .modal-title { font-size: 18px; line-height: 1.6; color: var(--text); margin-bottom: 14px; padding-left: 40px; }
+  .modal-body { font-size: 14px; color: var(--text2); line-height: 2; }
+
+  /* ── SEARCH BAR ── */
+  .big-search {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 0 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    height: 48px;
+    transition: border-color 0.2s;
+  }
+  .big-search:focus-within { border-color: var(--accent); box-shadow: var(--glow); }
+  .big-search input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--text);
+    font-family: var(--font-urdu);
+    font-size: 15px;
+  }
+  .search-icon { color: var(--text3); font-size: 16px; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 700px) {
+    nav { padding: 0 12px; }
+    .nav-links { display: none; }
+    main { padding: 0 12px; }
+    th:nth-child(n+5) { display: none; }
+    td:nth-child(n+5) { display: none; }
+  }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--bg3); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--text3); }
+
+  /* ── LOADING ANIM ── */
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+  .loading {
+    background: linear-gradient(90deg, var(--bg3) 25%, var(--bg2) 50%, var(--bg3) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 4px;
+    color: transparent;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--bg2);
+    border-top: 1px solid var(--border);
+    padding: 24px;
+    text-align: center;
+    font-size: 12px;
+    color: var(--text3);
+    font-family: var(--font-en);
+    margin-top: 40px;
+    position: relative;
+    z-index: 1;
+  }
+  footer a { color: var(--accent); text-decoration: none; }
+
+  /* coin color themes */
+  .btc { background: rgba(247,147,26,0.15); color: #f7931a; }
+  .eth { background: rgba(98,126,234,0.15); color: #627eea; }
+  .bnb { background: rgba(240,185,11,0.15); color: #f0b90b; }
+  .sol { background: rgba(153,69,255,0.15); color: #9945ff; }
+  .ada { background: rgba(0,51,173,0.15); color: #0033ad; }
+  .dot { background: rgba(230,0,122,0.15); color: #e6007a; }
+  .xrp { background: rgba(0,90,214,0.15); color: #005ad6; }
+  .doge { background: rgba(194,165,24,0.15); color: #c2a518; }
+  .matic { background: rgba(130,71,229,0.15); color: #8247e5; }
+  .link { background: rgba(55,91,211,0.15); color: #375bd3; }
+  .avax { background: rgba(232,65,66,0.15); color: #e84142; }
+  .usdt { background: rgba(38,161,123,0.15); color: #26a17b; }
+  .usdc { background: rgba(39,117,202,0.15); color: #2775ca; }
+  .busd { background: rgba(240,185,11,0.15); color: #f0b90b; }
+  .dai { background: rgba(250,174,54,0.15); color: #faae36; }
+</style>
+</head>
+<body>
+
+<!-- TICKER -->
+<div class="ticker-wrap">
+  <div class="ticker-label">LIVE</div>
+  <div style="overflow:hidden;flex:1">
+    <div class="ticker-track" id="ticker">
+      <span class="ticker-item"><span class="sym">BTC</span> <span class="up">$67,420</span> <span class="up">▲2.4%</span></span>
+      <span class="ticker-item"><span class="sym">ETH</span> <span class="up">$3,812</span> <span class="up">▲1.8%</span></span>
+      <span class="ticker-item"><span class="sym">SOL</span> <span class="dn">$172.4</span> <span class="dn">▼0.9%</span></span>
+      <span class="ticker-item"><span class="sym">BNB</span> <span class="up">$608</span> <span class="up">▲0.7%</span></span>
+      <span class="ticker-item"><span class="sym">XRP</span> <span class="up">$0.6412</span> <span class="up">▲3.2%</span></span>
+      <span class="ticker-item"><span class="sym">DOGE</span> <span class="dn">$0.1623</span> <span class="dn">▼1.1%</span></span>
+      <span class="ticker-item"><span class="sym">ADA</span> <span class="up">$0.4921</span> <span class="up">▲0.5%</span></span>
+      <span class="ticker-item"><span class="sym">AVAX</span> <span class="up">$38.74</span> <span class="up">▲4.1%</span></span>
+      <span class="ticker-item"><span class="sym">MATIC</span> <span class="dn">$0.8812</span> <span class="dn">▼0.4%</span></span>
+      <span class="ticker-item"><span class="sym">LINK</span> <span class="up">$18.43</span> <span class="up">▲2.9%</span></span>
+      <span class="ticker-item"><span class="sym">DOT</span> <span class="up">$7.24</span> <span class="up">▲1.3%</span></span>
+      <span class="ticker-item"><span class="sym">USDT</span> <span class="up">$1.0001</span> <span class="up">▲0.01%</span></span>
+      <!-- duplicate for seamless loop -->
+      <span class="ticker-item"><span class="sym">BTC</span> <span class="up">$67,420</span> <span class="up">▲2.4%</span></span>
+      <span class="ticker-item"><span class="sym">ETH</span> <span class="up">$3,812</span> <span class="up">▲1.8%</span></span>
+      <span class="ticker-item"><span class="sym">SOL</span> <span class="dn">$172.4</span> <span class="dn">▼0.9%</span></span>
+      <span class="ticker-item"><span class="sym">BNB</span> <span class="up">$608</span> <span class="up">▲0.7%</span></span>
+      <span class="ticker-item"><span class="sym">XRP</span> <span class="up">$0.6412</span> <span class="up">▲3.2%</span></span>
+      <span class="ticker-item"><span class="sym">DOGE</span> <span class="dn">$0.1623</span> <span class="dn">▼1.1%</span></span>
+    </div>
+  </div>
+</div>
+
+<!-- NAVBAR -->
+<nav>
+  <a class="logo" href="#" onclick="showPage('home')">Crypto<span>اردو</span></a>
+  <ul class="nav-links">
+    <li><a onclick="showPage('home')" class="active" id="nav-home">ہوم</a></li>
+    <li><a onclick="showPage('news')" id="nav-news">خبریں</a></li>
+    <li><a onclick="showPage('coins')" id="nav-coins">تمام کوائن</a></li>
+    <li><a onclick="showPage('alts')" id="nav-alts">آلٹ کوائن</a></li>
+    <li><a onclick="showPage('stables')" id="nav-stables">اسٹیبل کوائن</a></li>
+    <li><a onclick="showPage('whales')" id="nav-whales">بڑے سرمایہ کار</a></li>
+  </ul>
+  <div class="nav-right">
+    <div class="live-badge"><div class="live-dot"></div> LIVE</div>
+  </div>
+</nav>
+
+<main>
+
+<!-- ════════════════ HOME PAGE ════════════════ -->
+<div class="page active" id="page-home">
+
+  <div class="section-tabs">
+    <button class="tab-btn active" onclick="showPage('home')">🏠 ہوم</button>
+    <button class="tab-btn" onclick="showPage('news')">📰 خبریں</button>
+    <button class="tab-btn" onclick="showPage('coins')">💰 کوائن</button>
+    <button class="tab-btn" onclick="showPage('alts')">🚀 آلٹ کوائن</button>
+    <button class="tab-btn" onclick="showPage('stables')">🔒 اسٹیبل کوائن</button>
+    <button class="tab-btn" onclick="showPage('whales')">🐋 بڑے سرمایہ کار</button>
+  </div>
+
+  <!-- MARKET STATS -->
+  <div class="hero-stats" style="margin-top:20px">
+    <div class="stat-card">
+      <div class="stat-label">Total Market Cap</div>
+      <div class="stat-value">$2.41T</div>
+      <div class="stat-change up">▲ 1.8% (24h)</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">24h Volume</div>
+      <div class="stat-value">$94.2B</div>
+      <div class="stat-change up">▲ 12.4%</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">BTC Dominance</div>
+      <div class="stat-value">52.3%</div>
+      <div class="stat-change dn">▼ 0.4%</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Fear & Greed</div>
+      <div class="stat-value" style="color:var(--green)">72</div>
+      <div class="stat-change up">Greed</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Active Cryptos</div>
+      <div class="stat-value">12,840</div>
+      <div class="stat-change up">▲ 24 new today</div>
+    </div>
+  </div>
+
+  <!-- MARKET SENTIMENT -->
+  <div class="sentiment-section">
+    <div class="sentiment-title">مارکیٹ سینٹیمنٹ — AI تجزیہ</div>
+    <div class="sentiment-bar-wrap">
+      <div class="sentiment-score s-bullish">72</div>
+      <div style="flex:1">
+        <div class="sentiment-bar">
+          <div class="sentiment-fill">
+            <div class="sentiment-needle" style="left:72%"></div>
+          </div>
+        </div>
+        <div class="sentiment-labels">
+          <span>شدید Bearish</span>
+          <span>Bearish</span>
+          <span>Neutral</span>
+          <span>Bullish</span>
+          <span>شدید Bullish</span>
+        </div>
+      </div>
+      <div style="font-size:13px;color:var(--green);min-width:70px;text-align:center;font-family:var(--font-urdu)">
+        Bullish<br><span style="font-size:11px;color:var(--text3)">مضبوط تیزی</span>
+      </div>
+    </div>
+    <div class="ai-box" style="margin-top:12px">
+      <div class="ai-header"><span class="ai-icon">🤖</span> AI مارکیٹ خلاصہ</div>
+      <div class="ai-text">آج کی مارکیٹ میں مجموعی طور پر تیزی دیکھی جا رہی ہے۔ Bitcoin نے $67,000 کی سطح کو عبور کر لیا ہے جو ایک مضبوط تیزی کی علامت ہے۔ Institutional خریداری اور ETF میں بڑھتی ہوئی دلچسپی مارکیٹ کو آگے لے جا رہی ہے۔ تاہم Short-term میں کچھ مزاحمت ممکن ہے۔</div>
+    </div>
+  </div>
+
+  <!-- TOP GAINERS & LOSERS -->
+  <div class="gl-grid">
+    <div class="gl-card">
+      <div class="gl-title"><div class="gl-dot" style="background:var(--green)"></div> آج کے سب سے بڑے Gainers</div>
+      <div class="gl-item">
+        <div class="gl-coin-info"><div class="coin-icon avax">AVAX</div><div><div class="gl-sym">AVAX</div><div class="gl-name">Avalanche</div></div></div>
+        <div><div class="gl-price">$38.74</div><div class="gl-pct up-color">+4.1%</div></div>
+      </div>
+      <div class="gl-item">
+        <div class="gl-coin-info"><div class="coin-icon xrp">XRP</div><div><div class="gl-sym">XRP</div><div class="gl-name">Ripple</div></div></div>
+        <div><div class="gl-price">$0.6412</div><div class="gl-pct up-color">+3.2%</div></div>
+      </div>
+      <div class="gl-item">
+        <div class="gl-coin-info"><div class="coin-icon link">LINK</div><div><div class="gl-sym">LINK</div><div class="gl-name">Chainlink</div></div></div>
+        <div><div class="gl-price">$18.43</div><div class="gl-pct up-color">+2.9%</div></div>
+      </div>
+      <div class="gl-item">
+        <div class="gl-coin-info"><div class="coin-icon btc">BTC</div><div><div class="gl-sym">BTC</div><div class="gl-name">Bitcoin</div></div></div>
+        <div><div class="gl-price">$67,420</div><div class="gl-pct up-color">+2.4%</div></div>
+      </div>
+      <div class="gl-item">
+        <div class="gl-coin-info"><div class="coin-icon eth">ETH</div><div><div class="gl-sym">ETH</div><div class="gl-name">Ethereum</div></div></div>
+        <div><div class="gl-price">$3,812</div><div class="gl-pct up-color">+1.8%</div></div>
+      </div>
+    </div>
+    <div class="gl-card">
+      <div class="gl-title"><div class="gl-dot" style="background:var(--red)"></div> آج کے سب سے بڑے Losers</div>
+      <div class="gl-item">
+        <div class="gl-coin-info"><div class="coin-icon doge">DOGE</div><div><div class="gl-sym">DOGE</div><div class="gl-name">Dogecoin</div></div></div>
+        <div><div class="gl-price">$0.1623</div><div class="gl-pct dn-color">-1.1%</div></div>
+      </div>
+      <div class="gl-item">
+        <div class="gl-coin-info"><div class="coin-icon matic">MATIC</div><div><div class="gl-sym">MATIC</div><div class="gl-name">Polygon</div></div></div>
+        <div><div class="gl-price">$0.8812</div><div class="gl-pct dn-color">-0.4%</div></div>
+      </div>
+      <div class="gl-item">
+        <div class="gl-coin-info"><div class="coin-icon sol">SOL</div><div><div class="gl-sym">SOL</div><div class="gl-name">Solana</div></div></div>
+        <div><div class="gl-price">$172.4</div><div class="gl-pct dn-color">-0.9%</div></div>
+      </div>
+      <div class="gl-item">
+        <div class="gl-coin-info"><div class="coin-icon ada">ADA</div><div><div class="gl-sym">ADA</div><div class="gl-name">Cardano</div></div></div>
+        <div><div class="gl-price">$0.4921</div><div class="gl-pct dn-color">-0.3%</div></div>
+      </div>
+      <div class="gl-item">
+        <div class="gl-coin-info"><div class="coin-icon dot">DOT</div><div><div class="gl-sym">DOT</div><div class="gl-name">Polkadot</div></div></div>
+        <div><div class="gl-price">$7.24</div><div class="gl-pct dn-color">-0.2%</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LATEST NEWS -->
+  <div class="section-title">تازہ ترین خبریں</div>
+  <div class="news-grid">
+    <div class="news-main">
+      <div class="news-card featured" onclick="openModal('n1')">
+        <div class="news-meta">
+          <span class="news-tag tag-bullish">Bullish</span>
+          <span class="news-coin-badge">BTC</span>
+          <span class="news-time">2 گھنٹے پہلے</span>
+          <span class="news-source">CoinDesk</span>
+        </div>
+        <div class="news-title">BlackRock کے Bitcoin ETF میں ریکارڈ $2.4 ارب کی سرمایہ کاری، مارکیٹ میں تیزی</div>
+        <div class="news-summary">دنیا کی سب سے بڑی اثاثہ جات مینجمنٹ کمپنی BlackRock نے اپنے Bitcoin ETF میں ایک دن میں ریکارڈ سرمایہ کاری کی ہے۔</div>
+        <div class="ai-box">
+          <div class="ai-header"><span class="ai-icon">🤖</span> AI خلاصہ</div>
+          <div class="ai-text">یہ خبر Bitcoin کے لیے انتہائی Bullish ہے۔ Institutional سرمایہ کاری بڑھ رہی ہے جو مارکیٹ کی پختگی کی علامت ہے۔ قیمت اگلے ہفتے $70,000 کو چھو سکتی ہے۔</div>
+        </div>
+      </div>
+      <div class="news-card" onclick="openModal('n2')">
+        <div class="news-meta">
+          <span class="news-tag tag-bearish">Bearish</span>
+          <span class="news-coin-badge">ETH</span>
+          <span class="news-time">4 گھنٹے پہلے</span>
+          <span class="news-source">Reuters</span>
+        </div>
+        <div class="news-title">SEC نے Ethereum Spot ETF کی منظوری میں تاخیر کر دی</div>
+        <div class="news-summary">امریکی Securities and Exchange Commission نے Ethereum کے Spot ETF کے فیصلے کو مزید 3 ماہ کے لیے ملتوی کر دیا ہے۔</div>
+      </div>
+    </div>
+    <div class="news-side">
+      <div class="news-card" onclick="openModal('n3')">
+        <div class="news-meta">
+          <span class="news-tag tag-neutral">Neutral</span>
+          <span class="news-coin-badge">SOL</span>
+          <span class="news-time">5 گھنٹے پہلے</span>
+        </div>
+        <div class="news-title">Solana نے نئی Upgrade متعارف کرا دی</div>
+        <div class="news-summary">Solana کی نئی Firedancer upgrade سے نیٹ ورک کی رفتار 1 ملین TPS تک پہنچ گئی۔</div>
+      </div>
+      <div class="news-card" onclick="openModal('n4')">
+        <div class="news-meta">
+          <span class="news-tag tag-bullish">Bullish</span>
+          <span class="news-coin-badge">XRP</span>
+          <span class="news-time">6 گھنٹے پہلے</span>
+        </div>
+        <div class="news-title">Ripple نے SEC کیس جیت لیا — XRP نے 3% اضافہ ریکارڈ کیا</div>
+      </div>
+      <div class="news-card" onclick="openModal('n5')">
+        <div class="news-meta">
+          <span class="news-tag tag-bearish">Bearish</span>
+          <span class="news-coin-badge">DOGE</span>
+          <span class="news-time">8 گھنٹے پہلے</span>
+        </div>
+        <div class="news-title">Elon Musk نے Dogecoin کا ذکر ٹوئٹر پر چھوڑ دیا</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════ NEWS PAGE ════════════════ -->
+<div class="page" id="page-news">
+  <div style="padding-top:20px">
+    <div class="big-search">
+      <span class="search-icon">🔍</span>
+      <input type="text" placeholder="خبر تلاش کریں..." oninput="filterNews(this.value)">
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+      <button class="filter-btn active" onclick="filterNewsByTag('all',this)">سب</button>
+      <button class="filter-btn" onclick="filterNewsByTag('bullish',this)">🟢 Bullish</button>
+      <button class="filter-btn" onclick="filterNewsByTag('bearish',this)">🔴 Bearish</button>
+      <button class="filter-btn" onclick="filterNewsByTag('neutral',this)">🟡 Neutral</button>
+      <button class="filter-btn" onclick="filterNewsByTag('btc',this)">Bitcoin</button>
+      <button class="filter-btn" onclick="filterNewsByTag('eth',this)">Ethereum</button>
+      <button class="filter-btn" onclick="filterNewsByTag('sol',this)">Solana</button>
+    </div>
+    <div id="news-list" style="display:flex;flex-direction:column;gap:12px">
+      <!-- news items -->
+      <div class="news-card" data-tags="bullish btc" onclick="openModal('n1')">
+        <div class="news-meta"><span class="news-tag tag-bullish">Bullish</span><span class="news-coin-badge">BTC</span><span class="news-time">2 گھنٹے پہلے</span><span class="news-source">CoinDesk</span></div>
+        <div class="news-title">BlackRock کے Bitcoin ETF میں ریکارڈ $2.4 ارب کی سرمایہ کاری</div>
+        <div class="news-summary">دنیا کی سب سے بڑی اثاثہ جات مینجمنٹ کمپنی BlackRock نے اپنے Bitcoin ETF میں ایک دن میں ریکارڈ سرمایہ کاری کی ہے جو مارکیٹ کے لیے انتہائی مثبت اشارہ ہے۔</div>
+        <div class="news-impact"><span class="news-tag tag-bullish">Bullish Impact</span><span class="impact-label">Bitcoin Price: <strong style="color:var(--green)">▲ مضبوط اضافے کا امکان</strong></span></div>
+      </div>
+      <div class="news-card" data-tags="bearish eth" onclick="openModal('n2')">
+        <div class="news-meta"><span class="news-tag tag-bearish">Bearish</span><span class="news-coin-badge">ETH</span><span class="news-time">4 گھنٹے پہلے</span><span class="news-source">Reuters</span></div>
+        <div class="news-title">SEC نے Ethereum Spot ETF کی منظوری میں 3 ماہ کی تاخیر کر دی</div>
+        <div class="news-summary">ETH کے سرمایہ کاروں کے لیے برا اشارہ — ETF کی تاخیر سے قیمت پر دباؤ پڑ سکتا ہے۔</div>
+        <div class="news-impact"><span class="news-tag tag-bearish">Bearish Impact</span><span class="impact-label">Ethereum Price: <strong style="color:var(--red)">▼ دباؤ ممکن</strong></span></div>
+      </div>
+      <div class="news-card" data-tags="neutral sol" onclick="openModal('n3')">
+        <div class="news-meta"><span class="news-tag tag-neutral">Neutral</span><span class="news-coin-badge">SOL</span><span class="news-time">5 گھنٹے پہلے</span></div>
+        <div class="news-title">Solana Firedancer Upgrade — نیٹ ورک کی رفتار 1M TPS</div>
+        <div class="news-summary">تکنیکی بہتری طویل مدتی Bullish لیکن قلیل مدتی اثر محدود۔</div>
+      </div>
+      <div class="news-card" data-tags="bullish xrp" onclick="openModal('n4')">
+        <div class="news-meta"><span class="news-tag tag-bullish">Bullish</span><span class="news-coin-badge">XRP</span><span class="news-time">6 گھنٹے پہلے</span></div>
+        <div class="news-title">Ripple نے SEC کیس جیتا — XRP قانونی طور پر Security نہیں</div>
+        <div class="news-summary">Ripple کی قانونی جیت XRP کے لیے تاریخی لمحہ — قیمت میں 3% سے زیادہ اضافہ دیکھا گیا۔</div>
+        <div class="news-impact"><span class="news-tag tag-bullish">Bullish Impact</span><span class="impact-label">XRP Price: <strong style="color:var(--green)">▲ تیزی کا امکان</strong></span></div>
+      </div>
+      <div class="news-card" data-tags="bearish doge" onclick="openModal('n5')">
+        <div class="news-meta"><span class="news-tag tag-bearish">Bearish</span><span class="news-coin-badge">DOGE</span><span class="news-time">8 گھنٹے پہلے</span></div>
+        <div class="news-title">Elon Musk نے DOGE کا حوالہ سوشل میڈیا پر دینا کم کر دیا</div>
+        <div class="news-summary">Meme coin اکثر Elon Musk کے tweets پر منحصر ہوتی ہے — توجہ کم ہونے سے قیمت میں کمی ممکن۔</div>
+      </div>
+      <div class="news-card" data-tags="bullish bnb" onclick="openModal('n6')">
+        <div class="news-meta"><span class="news-tag tag-bullish">Bullish</span><span class="news-coin-badge">BNB</span><span class="news-time">10 گھنٹے پہلے</span></div>
+        <div class="news-title">Binance نے نئی Launchpad سیریز کا اعلان کیا — BNB Staking ریوارڈز بڑھے</div>
+        <div class="news-summary">Binance Launchpad نے نئے پروجیکٹس کا اعلان کیا ہے جس سے BNB کی مانگ بڑھنے کا امکان ہے۔</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════ ALL COINS PAGE ════════════════ -->
+<div class="page" id="page-coins">
+  <div style="padding-top:20px">
+    <div class="coin-table-wrap">
+      <div class="coin-table-filters">
+        <button class="filter-btn active">سب</button>
+        <button class="filter-btn">Top 10</button>
+        <button class="filter-btn">Top 100</button>
+        <button class="filter-btn">DeFi</button>
+        <button class="filter-btn">Layer 1</button>
+        <button class="filter-btn">Layer 2</button>
+        <input class="filter-search" placeholder="🔍 کوائن تلاش کریں...">
+      </div>
+      <div style="overflow-x:auto">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>نام</th>
+              <th>قیمت (USD)</th>
+              <th>24h %</th>
+              <th>7d %</th>
+              <th>Market Cap</th>
+              <th>24h Volume</th>
+              <th>سب سے بڑا سرمایہ کار</th>
+              <th>7d Chart</th>
+            </tr>
+          </thead>
+          <tbody id="coin-tbody">
+            <!-- populated by JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════ ALT COINS PAGE ════════════════ -->
+<div class="page" id="page-alts">
+  <div style="padding-top:20px">
+    <div class="section-title">آلٹ کوائن سیکشن</div>
+    <div class="alt-categories">
+      <span class="cat-chip active" onclick="toggleCat(this,'all')">ALL</span>
+      <span class="cat-chip" onclick="toggleCat(this,'defi')">DeFi</span>
+      <span class="cat-chip" onclick="toggleCat(this,'layer1')">Layer 1</span>
+      <span class="cat-chip" onclick="toggleCat(this,'layer2')">Layer 2</span>
+      <span class="cat-chip" onclick="toggleCat(this,'gaming')">Gaming</span>
+      <span class="cat-chip" onclick="toggleCat(this,'ai')">AI Tokens</span>
+      <span class="cat-chip" onclick="toggleCat(this,'meme')">Meme Coins</span>
+      <span class="cat-chip" onclick="toggleCat(this,'oracle')">Oracles</span>
+    </div>
+
+    <div class="coin-table-wrap">
+      <div style="overflow-x:auto">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>نام</th>
+              <th>کیٹیگری</th>
+              <th>قیمت</th>
+              <th>24h %</th>
+              <th>Market Cap</th>
+              <th>سب سے بڑا Holder</th>
+              <th>AI سگنل</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="coin-rank">1</td>
+              <td><div class="coin-name-cell"><div class="coin-icon sol">SOL</div><div><div class="coin-fullname">Solana</div><div class="coin-ticker">SOL</div></div></div></td>
+              <td><span class="cat-chip active" style="cursor:default;font-size:10px;padding:2px 8px">Layer 1</span></td>
+              <td>$172.4</td>
+              <td class="dn-color">-0.9%</td>
+              <td>$75.2B</td>
+              <td><div class="top-holder"><div class="holder-name">Anatoly Yakovenko</div><div class="holder-amount">~5M SOL</div></div></td>
+              <td><span class="news-tag tag-bullish">Buy</span></td>
+            </tr>
+            <tr>
+              <td class="coin-rank">2</td>
+              <td><div class="coin-name-cell"><div class="coin-icon avax">AVX</div><div><div class="coin-fullname">Avalanche</div><div class="coin-ticker">AVAX</div></div></div></td>
+              <td><span class="cat-chip active" style="cursor:default;font-size:10px;padding:2px 8px">Layer 1</span></td>
+              <td>$38.74</td>
+              <td class="up-color">+4.1%</td>
+              <td>$15.8B</td>
+              <td><div class="top-holder"><div class="holder-name">Ava Labs</div><div class="holder-amount">Treasury Wallet</div></div></td>
+              <td><span class="news-tag tag-bullish">Strong Buy</span></td>
+            </tr>
+            <tr>
+              <td class="coin-rank">3</td>
+              <td><div class="coin-name-cell"><div class="coin-icon matic">POL</div><div><div class="coin-fullname">Polygon</div><div class="coin-ticker">MATIC</div></div></div></td>
+              <td><span class="cat-chip" style="cursor:default;font-size:10px;padding:2px 8px;border-color:var(--accent2);color:var(--accent2)">Layer 2</span></td>
+              <td>$0.8812</td>
+              <td class="dn-color">-0.4%</td>
+              <td>$8.2B</td>
+              <td><div class="top-holder"><div class="holder-name">Polygon Foundation</div><div class="holder-amount">2.1B MATIC</div></div></td>
+              <td><span class="news-tag tag-neutral">Hold</span></td>
+            </tr>
+            <tr>
+              <td class="coin-rank">4</td>
+              <td><div class="coin-name-cell"><div class="coin-icon link">LNK</div><div><div class="coin-fullname">Chainlink</div><div class="coin-ticker">LINK</div></div></div></td>
+              <td><span class="cat-chip" style="cursor:default;font-size:10px;padding:2px 8px;border-color:var(--yellow);color:var(--yellow)">Oracle</span></td>
+              <td>$18.43</td>
+              <td class="up-color">+2.9%</td>
+              <td>$10.6B</td>
+              <td><div class="top-holder"><div class="holder-name">Sergey Nazarov</div><div class="holder-amount">~35M LINK</div></div></td>
+              <td><span class="news-tag tag-bullish">Buy</span></td>
+            </tr>
+            <tr>
+              <td class="coin-rank">5</td>
+              <td><div class="coin-name-cell"><div class="coin-icon doge">DGE</div><div><div class="coin-fullname">Dogecoin</div><div class="coin-ticker">DOGE</div></div></div></td>
+              <td><span class="cat-chip" style="cursor:default;font-size:10px;padding:2px 8px;border-color:#e84142;color:#e84142">Meme</span></td>
+              <td>$0.1623</td>
+              <td class="dn-color">-1.1%</td>
+              <td>$23.1B</td>
+              <td><div class="top-holder"><div class="holder-name">Robinhood (Custody)</div><div class="holder-amount">~30B DOGE</div></div></td>
+              <td><span class="news-tag tag-bearish">Sell</span></td>
+            </tr>
+            <tr>
+              <td class="coin-rank">6</td>
+              <td><div class="coin-name-cell"><div class="coin-icon ada">ADA</div><div><div class="coin-fullname">Cardano</div><div class="coin-ticker">ADA</div></div></div></td>
+              <td><span class="cat-chip active" style="cursor:default;font-size:10px;padding:2px 8px">Layer 1</span></td>
+              <td>$0.4921</td>
+              <td class="dn-color">-0.3%</td>
+              <td>$17.2B</td>
+              <td><div class="top-holder"><div class="holder-name">Charles Hoskinson</div><div class="holder-amount">~648M ADA</div></div></td>
+              <td><span class="news-tag tag-neutral">Hold</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════ STABLECOINS PAGE ════════════════ -->
+<div class="page" id="page-stables">
+  <div style="padding-top:20px">
+    <div class="section-title">اسٹیبل کوائن سیکشن</div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:20px">
+      <div style="font-size:14px;color:var(--text2);line-height:1.9">اسٹیبل کوائن وہ کرپٹو کرنسیاں ہیں جن کی قیمت ایک مستحکم اثاثے (جیسے US Dollar) سے منسلک ہوتی ہے۔ یہ مارکیٹ میں اتار چڑھاؤ سے محفوظ رہنے کے لیے استعمال ہوتی ہیں۔</div>
+    </div>
+    <div class="stable-grid">
+      <div class="stable-card">
+        <div class="stable-header">
+          <div class="stable-icon usdt" style="border-color:#26a17b">₮</div>
+          <div><div class="stable-name">USDT</div><div class="stable-full">Tether</div></div>
+        </div>
+        <div><div class="stable-mcap">$110.2B</div><div class="stable-mcap-label">Market Cap</div></div>
+        <div class="stable-peg"><span class="peg-label">Peg Status</span><span class="peg-ok">$1.0001 ✓</span></div>
+        <div class="stable-vol">24h Volume: <strong style="color:var(--text)">$48.3B</strong></div>
+        <div class="ai-box"><div class="ai-header"><span class="ai-icon">🤖</span> AI</div><div class="ai-text" style="font-size:12px">سب سے زیادہ استعمال ہونے والا Stablecoin۔ Peg مستحکم ہے۔</div></div>
+      </div>
+      <div class="stable-card">
+        <div class="stable-header">
+          <div class="stable-icon usdc" style="border-color:#2775ca">$</div>
+          <div><div class="stable-name">USDC</div><div class="stable-full">USD Coin</div></div>
+        </div>
+        <div><div class="stable-mcap">$32.8B</div><div class="stable-mcap-label">Market Cap</div></div>
+        <div class="stable-peg"><span class="peg-label">Peg Status</span><span class="peg-ok">$1.0000 ✓</span></div>
+        <div class="stable-vol">24h Volume: <strong style="color:var(--text)">$6.1B</strong></div>
+        <div class="ai-box"><div class="ai-header"><span class="ai-icon">🤖</span> AI</div><div class="ai-text" style="font-size:12px">Circle کا Regulated Stablecoin۔ سب سے محفوظ آپشن۔</div></div>
+      </div>
+      <div class="stable-card">
+        <div class="stable-header">
+          <div class="stable-icon dai" style="border-color:#faae36">◈</div>
+          <div><div class="stable-name">DAI</div><div class="stable-full">MakerDAO DAI</div></div>
+        </div>
+        <div><div class="stable-mcap">$5.3B</div><div class="stable-mcap-label">Market Cap</div></div>
+        <div class="stable-peg"><span class="peg-label">Peg Status</span><span class="peg-ok">$0.9998 ✓</span></div>
+        <div class="stable-vol">24h Volume: <strong style="color:var(--text)">$312M</strong></div>
+        <div class="ai-box"><div class="ai-header"><span class="ai-icon">🤖</span> AI</div><div class="ai-text" style="font-size:12px">Decentralized Stablecoin۔ DeFi میں سب سے زیادہ استعمال۔</div></div>
+      </div>
+      <div class="stable-card">
+        <div class="stable-header">
+          <div class="stable-icon busd" style="border-color:#f0b90b">B</div>
+          <div><div class="stable-name">FDUSD</div><div class="stable-full">First Digital USD</div></div>
+        </div>
+        <div><div class="stable-mcap">$2.6B</div><div class="stable-mcap-label">Market Cap</div></div>
+        <div class="stable-peg"><span class="peg-label">Peg Status</span><span class="peg-warn">$0.9997 ⚠</span></div>
+        <div class="stable-vol">24h Volume: <strong style="color:var(--text)">$1.8B</strong></div>
+        <div class="ai-box"><div class="ai-header"><span class="ai-icon">🤖</span> AI</div><div class="ai-text" style="font-size:12px">Binance کا نیا Stablecoin۔ Peg میں معمولی انحراف — نظر رکھیں۔</div></div>
+      </div>
+    </div>
+
+    <!-- Stablecoin Market Share -->
+    <div class="sentiment-section">
+      <div class="sentiment-title">اسٹیبل کوائن مارکیٹ شیئر</div>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-top:10px">
+        <div>
+          <div style="display:flex;justify-content:space-between;font-family:var(--font-en);font-size:12px;margin-bottom:4px"><span style="color:var(--text2)">USDT</span><span style="color:var(--text)">72.8%</span></div>
+          <div style="background:var(--bg3);height:8px;border-radius:4px;overflow:hidden"><div style="width:72.8%;height:100%;background:#26a17b;border-radius:4px"></div></div>
+        </div>
+        <div>
+          <div style="display:flex;justify-content:space-between;font-family:var(--font-en);font-size:12px;margin-bottom:4px"><span style="color:var(--text2)">USDC</span><span style="color:var(--text)">21.7%</span></div>
+          <div style="background:var(--bg3);height:8px;border-radius:4px;overflow:hidden"><div style="width:21.7%;height:100%;background:#2775ca;border-radius:4px"></div></div>
+        </div>
+        <div>
+          <div style="display:flex;justify-content:space-between;font-family:var(--font-en);font-size:12px;margin-bottom:4px"><span style="color:var(--text2)">DAI</span><span style="color:var(--text)">3.5%</span></div>
+          <div style="background:var(--bg3);height:8px;border-radius:4px;overflow:hidden"><div style="width:3.5%;height:100%;background:#faae36;border-radius:4px"></div></div>
+        </div>
+        <div>
+          <div style="display:flex;justify-content:space-between;font-family:var(--font-en);font-size:12px;margin-bottom:4px"><span style="color:var(--text2)">Others</span><span style="color:var(--text)">2.0%</span></div>
+          <div style="background:var(--bg3);height:8px;border-radius:4px;overflow:hidden"><div style="width:2%;height:100%;background:var(--text3);border-radius:4px"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════ WHALES PAGE ════════════════ -->
+<div class="page" id="page-whales">
+  <div style="padding-top:20px">
+    <div class="section-title">سب سے بڑے سرمایہ کار (Whales)</div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:20px">
+      <div style="font-size:14px;color:var(--text2);line-height:1.9">یہ وہ افراد اور ادارے ہیں جن کے پاس سب سے زیادہ کرپٹو کرنسی ہے۔ ان کی خریداری یا فروخت مارکیٹ پر بڑا اثر ڈال سکتی ہے۔</div>
+    </div>
+
+    <div class="section-title" style="font-size:15px">Bitcoin (BTC) — سب سے بڑے Holders</div>
+    <div class="whale-card">
+      <div class="whale-list">
+        <div class="whale-item">
+          <div class="whale-rank gold">🥇</div>
+          <div class="whale-info">
+            <div class="whale-name">Satoshi Nakamoto (Unknown)</div>
+            <div class="whale-desc">Bitcoin کے موجد — آج تک یہ wallet استعمال نہیں ہوئی</div>
+          </div>
+          <div class="whale-amount"><div class="whale-value">~1.1M BTC</div><div class="whale-coin">≈ $74.1B</div></div>
+        </div>
+        <div class="whale-item">
+          <div class="whale-rank silver">🥈</div>
+          <div class="whale-info">
+            <div class="whale-name">BlackRock (IBIT ETF)</div>
+            <div class="whale-desc">دنیا کا سب سے بڑا ETF Fund</div>
+          </div>
+          <div class="whale-amount"><div class="whale-value">~260K BTC</div><div class="whale-coin">≈ $17.5B</div></div>
+        </div>
+        <div class="whale-item">
+          <div class="whale-rank bronze">🥉</div>
+          <div class="whale-info">
+            <div class="whale-name">MicroStrategy / Strategy</div>
+            <div class="whale-desc">Michael Saylor کی کمپنی — سب سے زیادہ Corporate BTC</div>
+          </div>
+          <div class="whale-amount"><div class="whale-value">~214K BTC</div><div class="whale-coin">≈ $14.4B</div></div>
+        </div>
+        <div class="whale-item">
+          <div class="whale-rank" style="font-size:15px">4</div>
+          <div class="whale-info">
+            <div class="whale-name">US Government (Seized)</div>
+            <div class="whale-desc">مختلف ضبط شدہ Wallets</div>
+          </div>
+          <div class="whale-amount"><div class="whale-value">~207K BTC</div><div class="whale-coin">≈ $13.9B</div></div>
+        </div>
+        <div class="whale-item">
+          <div class="whale-rank" style="font-size:15px">5</div>
+          <div class="whale-info">
+            <div class="whale-name">Binance Exchange</div>
+            <div class="whale-desc">Cold Storage Wallets</div>
+          </div>
+          <div class="whale-amount"><div class="whale-value">~143K BTC</div><div class="whale-coin">≈ $9.6B</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-title" style="font-size:15px;margin-top:20px">Ethereum (ETH) — سب سے بڑے Holders</div>
+    <div class="whale-card">
+      <div class="whale-list">
+        <div class="whale-item">
+          <div class="whale-rank gold">🥇</div>
+          <div class="whale-info">
+            <div class="whale-name">Ethereum Foundation</div>
+            <div class="whale-desc">ETH کی بنیادی تنظیم</div>
+          </div>
+          <div class="whale-amount"><div class="whale-value">~300K ETH</div><div class="whale-coin">≈ $1.14B</div></div>
+        </div>
+        <div class="whale-item">
+          <div class="whale-rank silver">🥈</div>
+          <div class="whale-info">
+            <div class="whale-name">Vitalik Buterin</div>
+            <div class="whale-desc">Ethereum کے Co-Founder</div>
+          </div>
+          <div class="whale-amount"><div class="whale-value">~240K ETH</div><div class="whale-coin">≈ $915M</div></div>
+        </div>
+        <div class="whale-item">
+          <div class="whale-rank bronze">🥉</div>
+          <div class="whale-info">
+            <div class="whale-name">Grayscale ETHE Trust</div>
+            <div class="whale-desc">Institutional ETH Fund</div>
+          </div>
+          <div class="whale-amount"><div class="whale-value">~2.1M ETH</div><div class="whale-coin">≈ $8.0B</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-title" style="font-size:15px;margin-top:20px">Solana (SOL) — سب سے بڑے Holders</div>
+    <div class="whale-card">
+      <div class="whale-list">
+        <div class="whale-item">
+          <div class="whale-rank gold">🥇</div>
+          <div class="whale-info">
+            <div class="whale-name">FTX Estate (Bankrupt)</div>
+            <div class="whale-desc">FTX دیوالیہ اسٹیٹ سے منسلک wallets</div>
+          </div>
+          <div class="whale-amount"><div class="whale-value">~41M SOL</div><div class="whale-coin">≈ $7.1B</div></div>
+        </div>
+        <div class="whale-item">
+          <div class="whale-rank silver">🥈</div>
+          <div class="whale-info">
+            <div class="whale-name">Solana Foundation</div>
+            <div class="whale-desc">Treasury Reserves</div>
+          </div>
+          <div class="whale-amount"><div class="whale-value">~9M SOL</div><div class="whale-coin">≈ $1.55B</div></div>
+        </div>
+        <div class="whale-item">
+          <div class="whale-rank bronze">🥉</div>
+          <div class="whale-info">
+            <div class="whale-name">Anatoly Yakovenko</div>
+            <div class="whale-desc">Solana کے Co-Founder</div>
+          </div>
+          <div class="whale-amount"><div class="whale-value">~5M SOL</div><div class="whale-coin">≈ $862M</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<!-- ════════ NEWS MODAL ════════ -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+  <div class="modal" id="modal-box">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-title" id="modal-title"></div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<footer>
+  <div style="margin-bottom:8px;font-size:14px;color:var(--text2)">CryptoUrduu — تازہ ترین کرپٹو خبریں اردو میں</div>
+  <div>© 2024 CryptoUrdu | ڈیٹا صرف معلوماتی مقاصد کے لیے — سرمایہ کاری کا مشورہ نہیں | <a href="#">Privacy Policy</a> | <a href="#">اشتہار دیں</a></div>
+</footer>
+
+<script>
+// ══ COIN DATA ══
+const coins = [
+  { rank:1, sym:'BTC', name:'Bitcoin', cls:'btc', price:'$67,420', h24:'+2.4%', h24up:true, d7:'+8.2%', d7up:true, mcap:'$1.33T', vol:'$38.4B', holder:'BlackRock IBIT', holderAmt:'~260K BTC', spark:[60,62,58,65,70,68,72] },
+  { rank:2, sym:'ETH', name:'Ethereum', cls:'eth', price:'$3,812', h24:'+1.8%', h24up:true, d7:'+5.1%', d7up:true, mcap:'$457B', vol:'$18.2B', holder:'Grayscale ETHE', holderAmt:'~2.1M ETH', spark:[50,52,49,55,58,56,60] },
+  { rank:3, sym:'BNB', name:'BNB Chain', cls:'bnb', price:'$608', h24:'+0.7%', h24up:true, d7:'+3.2%', d7up:true, mcap:'$89B', vol:'$2.1B', holder:'Binance Foundation', holderAmt:'~40M BNB', spark:[40,42,41,44,46,45,47] },
+  { rank:4, sym:'SOL', name:'Solana', cls:'sol', price:'$172.4', h24:'-0.9%', h24up:false, d7:'+6.8%', d7up:true, mcap:'$75.2B', vol:'$3.4B', holder:'FTX Estate', holderAmt:'~41M SOL', spark:[45,43,44,48,52,50,49] },
+  { rank:5, sym:'XRP', name:'Ripple', cls:'xrp', price:'$0.6412', h24:'+3.2%', h24up:true, d7:'+11.4%', d7up:true, mcap:'$35.1B', vol:'$2.8B', holder:'Ripple Labs', holderAmt:'~50B XRP (Escrow)', spark:[30,31,29,34,38,37,40] },
+  { rank:6, sym:'ADA', name:'Cardano', cls:'ada', price:'$0.4921', h24:'-0.3%', h24up:false, d7:'+1.2%', d7up:true, mcap:'$17.2B', vol:'$520M', holder:'Charles Hoskinson', holderAmt:'~648M ADA', spark:[35,34,33,36,38,37,37] },
+  { rank:7, sym:'AVAX', name:'Avalanche', cls:'avax', price:'$38.74', h24:'+4.1%', h24up:true, d7:'+14.2%', d7up:true, mcap:'$15.8B', vol:'$820M', holder:'Ava Labs Treasury', holderAmt:'~9.7M AVAX', spark:[28,30,29,33,36,37,40] },
+  { rank:8, sym:'DOGE', name:'Dogecoin', cls:'doge', price:'$0.1623', h24:'-1.1%', h24up:false, d7:'-2.8%', d7up:false, mcap:'$23.1B', vol:'$1.2B', holder:'Robinhood Custody', holderAmt:'~30B DOGE', spark:[50,48,46,44,43,42,41] },
+  { rank:9, sym:'DOT', name:'Polkadot', cls:'dot', price:'$7.24', h24:'+1.3%', h24up:true, d7:'+4.4%', d7up:true, mcap:'$9.5B', vol:'$380M', holder:'Web3 Foundation', holderAmt:'~297M DOT', spark:[32,33,32,34,36,35,36] },
+  { rank:10, sym:'MATIC', name:'Polygon', cls:'matic', price:'$0.8812', h24:'-0.4%', h24up:false, d7:'+2.1%', d7up:true, mcap:'$8.2B', vol:'$290M', holder:'Polygon Foundation', holderAmt:'~2.1B MATIC', spark:[38,37,36,38,40,39,39] },
+  { rank:11, sym:'LINK', name:'Chainlink', cls:'link', price:'$18.43', h24:'+2.9%', h24up:true, d7:'+9.3%', d7up:true, mcap:'$10.6B', vol:'$610M', holder:'Sergey Nazarov', holderAmt:'~35M LINK', spark:[30,31,30,33,36,37,40] },
+  { rank:12, sym:'LTC', name:'Litecoin', cls:'btc', price:'$84.21', h24:'+0.4%', h24up:true, d7:'+1.8%', d7up:true, mcap:'$6.3B', vol:'$420M', holder:'Charlie Lee', holderAmt:'~500K LTC', spark:[40,41,40,42,43,42,43] },
+];
+
+function buildSpark(vals, isUp) {
+  const max = Math.max(...vals), min = Math.min(...vals);
+  const range = max - min || 1;
+  return vals.map(v => {
+    const h = Math.round(8 + (v - min) / range * 20);
+    return `<div class="spark-bar" style="height:${h}px;background:${isUp ? 'var(--green)' : 'var(--red)'}"></div>`;
+  }).join('');
+}
+
+function buildCoinTable() {
+  const tbody = document.getElementById('coin-tbody');
+  tbody.innerHTML = coins.map(c => `
+    <tr>
+      <td class="coin-rank">${c.rank}</td>
+      <td><div class="coin-name-cell">
+        <div class="coin-icon ${c.cls}">${c.sym.slice(0,3)}</div>
+        <div><div class="coin-fullname">${c.name}</div><div class="coin-ticker">${c.sym}</div></div>
+      </div></td>
+      <td style="font-family:var(--font-mono);font-weight:600">${c.price}</td>
+      <td class="${c.h24up?'up-color':'dn-color'}">${c.h24}</td>
+      <td class="${c.d7up?'up-color':'dn-color'}">${c.d7}</td>
+      <td style="color:var(--text2)">${c.mcap}</td>
+      <td style="color:var(--text2)">${c.vol}</td>
+      <td><div class="top-holder"><div class="holder-name">${c.holder}</div><div class="holder-amount">${c.holderAmt}</div></div></td>
+      <td><div class="spark">${buildSpark(c.spark, c.d7up)}</div></td>
+    </tr>
+  `).join('');
+}
+buildCoinTable();
+
+// ══ PAGE NAVIGATION ══
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+  const nav = document.getElementById('nav-'+id);
+  if (nav) nav.classList.add('active');
+}
+
+// ══ NEWS MODAL ══
+const modalData = {
+  n1: {
+    title: 'BlackRock کے Bitcoin ETF میں ریکارڈ $2.4 ارب کی سرمایہ کاری',
+    body: `<div style="margin-bottom:12px"><span class="news-tag tag-bullish">Bullish</span> <span class="news-coin-badge">BTC</span> <span class="news-source">• CoinDesk • 2 گھنٹے پہلے</span></div>
+    <p style="margin-bottom:12px">دنیا کی سب سے بڑی اثاثہ جات مینجمنٹ کمپنی BlackRock نے اپنے iShares Bitcoin Trust ETF (IBIT) میں ایک ہی دن میں ریکارڈ $2.4 ارب ڈالر کی سرمایہ کاری ریکارڈ کی ہے۔ یہ ETF کی تاریخ میں کسی بھی ایک دن کا سب سے بڑا اندراج ہے۔</p>
+    <p style="margin-bottom:12px">اس سرمایہ کاری کے نتیجے میں BlackRock کے پاس مجموعی طور پر 260,000 سے زیادہ Bitcoin جمع ہو گئی ہے، جو تقریباً $17.5 ارب کے برابر ہے۔ ماہرین کا کہنا ہے کہ Institutional دلچسپی میں یہ اضافہ Bitcoin کی قیمت کے لیے انتہائی Bullish اشارہ ہے۔</p>
+    <div class="ai-box">
+      <div class="ai-header"><span class="ai-icon">🤖</span> AI مارکیٹ تجزیہ</div>
+      <div class="ai-text">یہ خبر Bitcoin کے لیے انتہائی مثبت ہے۔ Institutional سرمایہ کاری میں اس طرح کا اضافہ دو اہم باتوں کی نشاندہی کرتا ہے: پہلی بات، بڑے ادارے Bitcoin کو ایک جائز اثاثہ مان رہے ہیں۔ دوسری بات، Spot ETF کے ذریعے نئی رقم مارکیٹ میں آ رہی ہے جو مانگ بڑھاتی ہے۔ قلیل مدت میں $70,000 اور طویل مدت میں $80,000-$100,000 کا ہدف ممکن ہے۔ Market Impact: <strong style="color:var(--green)">انتہائی Bullish</strong></div>
+    </div>`
+  },
+  n2: {
+    title: 'SEC نے Ethereum Spot ETF کی منظوری میں 3 ماہ کی تاخیر کر دی',
+    body: `<div style="margin-bottom:12px"><span class="news-tag tag-bearish">Bearish</span> <span class="news-coin-badge">ETH</span> <span class="news-source">• Reuters • 4 گھنٹے پہلے</span></div>
+    <p style="margin-bottom:12px">امریکی Securities and Exchange Commission (SEC) نے Ethereum Spot ETF کی منظوری کو مزید 3 ماہ کے لیے ملتوی کر دیا ہے۔ یہ فیصلہ ETH کے سرمایہ کاروں کے لیے مایوس کن ہے جو کئی ماہ سے ETF کی منظوری کا انتظار کر رہے تھے۔</p>
+    <div class="ai-box">
+      <div class="ai-header"><span class="ai-icon">🤖</span> AI مارکیٹ تجزیہ</div>
+      <div class="ai-text">SEC کی تاخیر قلیل مدتی طور پر Bearish ہے لیکن طویل مدتی تصویر تبدیل نہیں ہوتی۔ ETH کی قیمت $3,600-$3,700 کی سطح پر support تلاش کر سکتی ہے۔ Market Impact: <strong style="color:var(--red)">قلیل مدتی Bearish</strong></div>
+    </div>`
+  },
+  n3: {
+    title: 'Solana Firedancer Upgrade — نیٹ ورک کی رفتار 1M TPS تک پہنچ گئی',
+    body: `<div style="margin-bottom:12px"><span class="news-tag tag-neutral">Neutral</span> <span class="news-coin-badge">SOL</span></div>
+    <p style="margin-bottom:12px">Solana کی نئی Firedancer validator client upgrade نے نیٹ ورک کی transaction processing speed کو 1 million transactions per second تک بڑھا دیا ہے۔ یہ بلاکچین کی دنیا میں ایک نیا ریکارڈ ہے۔</p>
+    <div class="ai-box">
+      <div class="ai-header"><span class="ai-icon">🤖</span> AI تجزیہ</div>
+      <div class="ai-text">تکنیکی بہتری طویل مدتی Bullish ہے۔ زیادہ رفتار = زیادہ users = زیادہ مانگ۔ لیکن قلیل مدت میں قیمت پر محدود اثر ہوگا۔ Market Impact: <strong style="color:var(--yellow)">Neutral / طویل مدتی Bullish</strong></div>
+    </div>`
+  },
+  n4: {
+    title: 'Ripple نے SEC کیس جیتا — XRP قانونی طور پر Security نہیں',
+    body: `<div style="margin-bottom:12px"><span class="news-tag tag-bullish">Bullish</span> <span class="news-coin-badge">XRP</span></div>
+    <p style="margin-bottom:12px">امریکی عدالت نے فیصلہ دیا ہے کہ XRP programmatic sales میں security نہیں ہے۔ Ripple کی یہ قانونی فتح XRP کے لیے ایک تاریخی لمحہ ہے۔</p>
+    <div class="ai-box">
+      <div class="ai-header"><span class="ai-icon">🤖</span> AI تجزیہ</div>
+      <div class="ai-text">قانونی غیر یقینی صورتحال ختم ہونے سے Exchange listings بڑھیں گی اور Institutional سرمایہ کاری آئے گی۔ Market Impact: <strong style="color:var(--green)">انتہائی Bullish</strong></div>
+    </div>`
+  },
+  n5: {
+    title: 'Elon Musk نے DOGE کا حوالہ سوشل میڈیا پر دینا کم کر دیا',
+    body: `<div style="margin-bottom:12px"><span class="news-tag tag-bearish">Bearish</span> <span class="news-coin-badge">DOGE</span></div>
+    <p style="margin-bottom:12px">Dogecoin کی قیمت تاریخی طور پر Elon Musk کے tweets سے منسلک رہی ہے۔ حال ہی میں ان کی طرف سے DOGE کا ذکر کم ہو گیا ہے جس سے مارکیٹ میں بے یقینی ہے۔</p>
+    <div class="ai-box">
+      <div class="ai-header"><span class="ai-icon">🤖</span> AI تجزیہ</div>
+      <div class="ai-text">Meme coins بنیادی طور پر sentiment پر چلتی ہیں۔ بغیر catalyst کے DOGE $0.15 تک گر سکتی ہے۔ Market Impact: <strong style="color:var(--red)">Bearish</strong></div>
+    </div>`
+  },
+  n6: {
+    title: 'Binance نے نئی Launchpad سیریز کا اعلان کیا',
+    body: `<div style="margin-bottom:12px"><span class="news-tag tag-bullish">Bullish</span> <span class="news-coin-badge">BNB</span></div>
+    <p style="margin-bottom:12px">Binance نے اعلان کیا ہے کہ اگلے مہینے 3 نئے پروجیکٹس Launchpad پر آئیں گے جن میں participate کرنے کے لیے BNB ہولڈنگ ضروری ہوگی۔</p>
+    <div class="ai-box">
+      <div class="ai-header"><span class="ai-icon">🤖</span> AI تجزیہ</div>
+      <div class="ai-text">Launchpad انعقاد سے BNB کی مانگ عارضی طور پر بڑھتی ہے۔ Staking rewards بڑھنے سے selling pressure کم ہوگا۔ Market Impact: <strong style="color:var(--green)">Bullish</strong></div>
+    </div>`
+  }
+};
+
+function openModal(id) {
+  const d = modalData[id];
+  if (!d) return;
+  document.getElementById('modal-title').textContent = d.title;
+  document.getElementById('modal-body').innerHTML = d.body;
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+function closeModal(e) {
+  if (!e || e.target === document.getElementById('modal-overlay')) {
+    document.getElementById('modal-overlay').classList.remove('open');
+  }
+}
+
+// ══ NEWS FILTER ══
+function filterNewsByTag(tag, btn) {
+  document.querySelectorAll('#page-news .filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('#news-list .news-card').forEach(card => {
+    if (tag === 'all') { card.style.display = ''; return; }
+    const tags = card.dataset.tags || '';
+    card.style.display = tags.includes(tag) ? '' : 'none';
+  });
+}
+
+function filterNews(q) {
+  const query = q.toLowerCase();
+  document.querySelectorAll('#news-list .news-card').forEach(card => {
+    card.style.display = card.textContent.toLowerCase().includes(query) ? '' : 'none';
+  });
+}
+
+// ══ CATEGORY CHIPS ══
+function toggleCat(el, cat) {
+  document.querySelectorAll('.alt-categories .cat-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// ══ REAL-TIME TICKER SIMULATION ══
+function randomizePrice(base, pct) {
+  return base * (1 + (Math.random()-0.5) * pct);
+}
+
+// auto-refresh sentiment needle simulation
+let needlePos = 72;
+setInterval(() => {
+  needlePos = Math.max(30, Math.min(85, needlePos + (Math.random()-0.5)*3));
+  const needle = document.querySelector('.sentiment-needle');
+  if (needle) needle.style.left = needlePos + '%';
+}, 3000);
+</script>
+</body>
+</html>
